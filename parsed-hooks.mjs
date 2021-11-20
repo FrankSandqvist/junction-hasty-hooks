@@ -12,6 +12,7 @@ const extractText = (html) => {
 
     const lines =
         trimmed
+            .replace(/<a.*?>|<\/a>/g, '')
             .split(/\<\/p><p>|<br \/>/g)
             .map(t => t
                 .replace(/<!--(.*?)-->/g, '')
@@ -66,6 +67,8 @@ const parseScripts = (widget) => {
         type: 'script',
         id: widget.id,
         script,
+        x: widget.x,
+        y: widget.y
     }
 }
 
@@ -80,6 +83,8 @@ const parseConditions = (widget) => {
         type: 'condition',
         id: widget.id,
         expression,
+        x: widget.x,
+        y: widget.y
     }
 }
 
@@ -102,7 +107,8 @@ const parseEnds = (widget) => {
 
     if (!text) return;
 
-    const [status, response] = text.split(' ');
+    const [status, ...responseParts] = text.split(' ');
+    const response = responseParts.join(' ');
 
     if (isNaN(status)) {
         return [];
@@ -113,6 +119,8 @@ const parseEnds = (widget) => {
         id: widget.id,
         status,
         response,
+        x: widget.x,
+        y: widget.y
     }
 }
 
@@ -156,11 +164,12 @@ const parse = async () => {
 
     const iterate = (startShape) => {
         if (startShape.type === 'condition') {
-            const [trueLine, falseLine] = lines.filter(l => l.startId === startShape.id)
-            if (!trueLine || !falseLine) return [[], []];
+            const [line1, line2] = lines.filter(l => l.startId === startShape.id)
+            if (!line1 || !line2) return [[], []];
 
-            const trueShape = shapes.find(s => s.id === trueLine.endId);
-            const falseShape = shapes.find(s => s.id === falseLine.endId);
+            const booleanShapes = [shapes.find(s => s.id === line1.endId), shapes.find(s => s.id === line2.endId)]
+
+            const [trueShape, falseShape] = booleanShapes.sort((a, b) => a.x < b.x ? -1 : 1)
 
             return [startShape, [iterate(trueShape), iterate(falseShape)]]
         }

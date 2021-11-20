@@ -2,6 +2,7 @@
 
 import { BASE_SCRIPTS, HOOKS } from "./parsed-hooks.mjs"
 import vm from 'vm';
+import fetch from 'node-fetch';
 
 export const doHook = async (req, res) => {
     // console.log(req);
@@ -15,22 +16,25 @@ export const doHook = async (req, res) => {
         return;
     }
 
-    const context = vm.createContext();
+    const context = vm.createContext({
+        fetch
+    });
 
     for (const baseScript of BASE_SCRIPTS) {
-        console.log(baseScript.script)
         vm.runInContext(baseScript.script, context);
     }
 
-    const runSteps = (steps) => {
-        console.log('run steps', steps)
-        let conditionResult;
+    const runSteps = async (steps) => {
+        let conditionResult = false;
         for (const step of steps) {
-            console.log('run step', step)
             if (Array.isArray(step)) {
                 if (conditionResult) {
+                    conditionResult = false;
+                    console.log('true, so running', step[0])
                     runSteps(step[0]);
+                    continue;
                 }
+                console.log('false, so running', step[1])
                 runSteps(step[1]);
                 continue;
             }
@@ -45,14 +49,30 @@ export const doHook = async (req, res) => {
                     }
                 }
                 case 'script': {
-                    vm.runInContext(step.script, context);
+                    await new Promise((res, rej) => {
+                        context._asyncResolve = () => {
+                            res()
+                        }
+
+                        vm.runInContext(
+                            'new Promise(async (res, rej) => {' +
+                            'try { \n' +
+                            step.script + '\n' +
+                            '_asyncResolve()' +
+                            '} catch (err) { rej(err) }' +
+                            '})',
+                            context
+                        );
+                    })
                     break;
                 }
                 case 'condition': {
                     conditionResult = vm.runInContext(step.expression, context);
+                    console.log(conditionResult)
                     break;
                 }
                 case 'end': {
+                    console.log(step);
                     const response = vm.runInContext(step.response, context);
                     res.status(step.status).json(response)
                     break;
