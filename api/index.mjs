@@ -11,6 +11,8 @@ startParsing();
 
 const app = express();
 
+app.use(express.static('../demo-frontend/build'))
+
 app.use(express.json())
 
 app.get('/api/:path', doHook)
