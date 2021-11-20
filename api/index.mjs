@@ -12,7 +12,7 @@ startParsing();
 
 const app = express();
 
-app.use(express.static(join(__dirname, '../demo-frontend/build')))
+app.use(express.static('../demo-frontend/build'))
 
 app.use(express.json())
 
