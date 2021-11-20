@@ -4,7 +4,6 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { doHook } from './hook.mjs';
 import { startParsing } from './parsed-hooks.mjs';
-import { join } from 'path';
 
 dotenv.config()
 
@@ -12,7 +11,7 @@ startParsing();
 
 const app = express();
 
-app.use(express.static('../demo-frontend/build'))
+app.use(express.static('public'))
 
 app.use(express.json())
 
