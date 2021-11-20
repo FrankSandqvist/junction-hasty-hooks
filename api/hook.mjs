@@ -5,7 +5,6 @@ import vm from 'vm';
 import fetch from 'node-fetch';
 
 export const doHook = async (req, res) => {
-    // console.log(req);
     const hookSteps = HOOKS.find(h =>
         h[0].path === req.params.path &&
         h[0].method === req.method.toLowerCase()
@@ -17,16 +16,39 @@ export const doHook = async (req, res) => {
     }
 
     const context = vm.createContext({
-        fetch
+        fetch,
+        _miroToken: process.env.MIRO_TOKEN
     });
 
+
     for (const baseScript of BASE_SCRIPTS) {
-        vm.runInContext(baseScript.script, context);
+        try {
+            vm.runInContext(baseScript.script, context);
+        } catch (err) {
+            await fetch(`https://api.miro.com/v2/boards/${process.env.MIRO_BOARD}/sticky_notes`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    "data": { "content": `Something went wrong! \n ${err}` },
+                    "style": { "backgroundColor": "red" },
+                    "geometry": { "x": baseScript.x + Math.random() * 100 - 50, "y": baseScript.y + Math.random() * 100 - 50 }
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${process.env.MIRO_TOKEN}`
+                }
+            });
+
+            res.status(500).json('Error in board configuration.');
+            return;
+        }
     }
+
+    console.log(hookSteps);
 
     const runSteps = async (steps) => {
         let conditionResult = false;
         for (const step of steps) {
+            console.log('running step', step)
             if (Array.isArray(step)) {
                 if (conditionResult) {
                     conditionResult = false;
@@ -42,6 +64,7 @@ export const doHook = async (req, res) => {
             try {
                 switch (step.type) {
                     case 'entrypoint': {
+                        console.log(req.body)
                         const values = Object.entries(
                             req.method === 'GET' ? req.query : req.body
                         );
@@ -77,24 +100,26 @@ export const doHook = async (req, res) => {
                     }
                 }
             } catch (err) {
-                await fetch(`https://api.miro.com/v2/boards/o9J_lhnJ-Es%3D/sticky_notes`, {
+                await fetch(`https://api.miro.com/v2/boards/${process.env.MIRO_BOARD}/sticky_notes`, {
                     method: 'POST',
                     body: JSON.stringify({
                         "data": { "content": `Something went wrong! \n ${err}` },
                         "style": { "backgroundColor": "red" },
-                        "geometry": { "x": step.x, "y": step.y }
+                        "geometry": { "x": step.x + Math.random() * 100 - 50, "y": step.y + Math.random() * 100 - 50 }
                     }),
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${process.env.MIRO_TOKEN}`
                     }
-                })
+                });
 
-                res.status(500).json('Error in board configuration.')
+                res.status(500).json('Error in board configuration.');
                 return;
             }
         }
     }
+
+    console.log(hookSteps);
 
     runSteps(hookSteps)
 }

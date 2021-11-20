@@ -127,6 +127,8 @@ const parseEnds = (widget) => {
 export const startParsing = () => {
     //Let's just do a cron job for now...
     cron.schedule("*/5 * * * * *", parse)
+
+    parse()
 }
 
 
@@ -134,7 +136,7 @@ const parse = async () => {
     console.log('Updating endpoints');
 
     // Endpoint is limited to 1000 widgets. Should be good enough for now!
-    const res = await fetch("https://api.miro.com/v1/boards/o9J_lhnJ-Es%3D/widgets/", {
+    const res = await fetch(`https://api.miro.com/v1/boards/${process.env.MIRO_BOARD}/widgets/`, {
         headers: {
             Authorization: `Bearer ${process.env.MIRO_TOKEN}`
         }
@@ -189,6 +191,4 @@ const parse = async () => {
     HOOKS = hooks;
 
     BASE_SCRIPTS = scripts.filter(s => !hooks.flat(10).some(hs => hs.id === s.id));
-
-    console.log(BASE_SCRIPTS)
 };

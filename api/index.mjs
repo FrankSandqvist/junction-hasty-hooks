@@ -2,6 +2,9 @@
 
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
+import rateLimit from 'express-rate-limit';
+
 import { doHook } from './hook.mjs';
 import { startParsing } from './parsed-hooks.mjs';
 
@@ -10,6 +13,13 @@ dotenv.config()
 startParsing();
 
 const app = express();
+
+app.use(cors())
+
+app.use(rateLimit({
+    windowMs: 60 * 1000,
+    max: 20
+}));
 
 app.use(express.static('public'))
 
