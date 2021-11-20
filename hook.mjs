@@ -38,45 +38,60 @@ export const doHook = async (req, res) => {
                 runSteps(step[1]);
                 continue;
             }
-            switch (step.type) {
-                case 'entrypoint': {
-                    const values = Object.entries(
-                        req.method === 'GET' ? req.query : req.body
-                    );
 
-                    for (const [key, value] of values) {
-                        context[key] = value
+            try {
+                switch (step.type) {
+                    case 'entrypoint': {
+                        const values = Object.entries(
+                            req.method === 'GET' ? req.query : req.body
+                        );
+
+                        for (const [key, value] of values) {
+                            context[key] = value
+                        }
+                    }
+                    case 'script': {
+                        await new Promise((res, rej) => {
+                            context._asyncResolve = res
+                            context._asyncReject = rej
+
+                            vm.runInContext(
+                                'new Promise(async (res, rej) => { try { \n' +
+                                step.script + '\n' +
+                                '_asyncResolve() } catch (err) { _asyncReject(err) } })',
+                                context
+                            );
+                        })
+                        break;
+                    }
+                    case 'condition': {
+                        conditionResult = vm.runInContext(step.expression, context);
+                        console.log(conditionResult)
+                        break;
+                    }
+                    case 'end': {
+                        console.log(step);
+                        const response = vm.runInContext(step.response, context);
+                        res.status(step.status).json(response)
+                        break;
                     }
                 }
-                case 'script': {
-                    await new Promise((res, rej) => {
-                        context._asyncResolve = () => {
-                            res()
-                        }
+            } catch (err) {
+                await fetch(`https://api.miro.com/v2/boards/o9J_lhnJ-Es%3D/sticky_notes`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        "data": { "content": `Something went wrong! \n ${err}` },
+                        "style": { "backgroundColor": "red" },
+                        "geometry": { "x": step.x, "y": step.y }
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${process.env.MIRO_TOKEN}`
+                    }
+                })
 
-                        vm.runInContext(
-                            'new Promise(async (res, rej) => {' +
-                            'try { \n' +
-                            step.script + '\n' +
-                            '_asyncResolve()' +
-                            '} catch (err) { rej(err) }' +
-                            '})',
-                            context
-                        );
-                    })
-                    break;
-                }
-                case 'condition': {
-                    conditionResult = vm.runInContext(step.expression, context);
-                    console.log(conditionResult)
-                    break;
-                }
-                case 'end': {
-                    console.log(step);
-                    const response = vm.runInContext(step.response, context);
-                    res.status(step.status).json(response)
-                    break;
-                }
+                res.status(500).json('Error in board configuration.')
+                return;
             }
         }
     }

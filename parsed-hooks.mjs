@@ -125,10 +125,8 @@ const parseEnds = (widget) => {
 }
 
 export const startParsing = () => {
-    // Let's just do a cron job for now...
-    // cron.schedule("*/10 * * * * *", parse)
-
-    parse().then(() => { }).catch(err => { throw err })
+    //Let's just do a cron job for now...
+    cron.schedule("*/5 * * * * *", parse)
 }
 
 
