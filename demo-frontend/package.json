@@ -14,7 +14,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "craco build",
+    "build": "craco build && rm -rf ../api/public && mv build ../api/public",
     "test": "craco test"
   },
   "eslintConfig": {

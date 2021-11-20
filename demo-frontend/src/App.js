@@ -13,7 +13,7 @@ function App() {
         className="absolute left-0 top-0 bottom-0">
       </iframe>
       <div className="absolute w-1/2 left-1/2 top-0 bottom-0" style={{ backgroundColor: '#fe8f02' }}>
-        Yest
+        <img alt="Logo" src="logo.png" />
       </div>
     </div>
   );
