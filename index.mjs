@@ -11,6 +11,8 @@ startParsing();
 
 const app = express();
 
+app.use(express.json())
+
 app.get('/api/:path', doHook)
 
 app.post('/api/:path', doHook)

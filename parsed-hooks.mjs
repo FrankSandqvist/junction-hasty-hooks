@@ -4,7 +4,8 @@ import cron from 'node-cron';
 import fetch from 'node-fetch';
 
 // Cache the hooks here
-export let PARSED_HOOKS = [];
+export let BASE_SCRIPTS = [];
+export let HOOKS = [];
 
 const extractText = (html) => {
     const trimmed = html.slice(3, html.length - 4);;
@@ -117,8 +118,11 @@ const parseEnds = (widget) => {
 
 export const startParsing = () => {
     // Let's just do a cron job for now...
-    cron.schedule("*/10 * * * * *", parse)
+    // cron.schedule("*/10 * * * * *", parse)
+
+    parse().then(() => { }).catch(err => { throw err })
 }
+
 
 const parse = async () => {
     console.log('Updating endpoints');
@@ -134,42 +138,50 @@ const parse = async () => {
     const entrypoints = res.data.flatMap(parseEntrypoint);
 
     //@ts-ignore
-    const lines = res.data.flatMap(parseLines)
+    const lines = res.data.flatMap(parseLines);
 
+    //@ts-ignore
+    const scripts = res.data.flatMap(parseScripts);
 
     const shapes = [
         //@ts-ignore
-        ...res.data.flatMap(parseScripts),
+        ...scripts,
         //@ts-ignore
         ...res.data.flatMap(parseConditions),
         //@ts-ignore
         ...res.data.flatMap(parseEnds),
     ];
 
-    const hooks = [];
+    // console.log(entrypoints);
 
-    for (const entrypoint of entrypoints) {
-        console.log(entrypoint);
+    const iterate = (startShape) => {
+        if (startShape.type === 'condition') {
+            const [trueLine, falseLine] = lines.filter(l => l.startId === startShape.id)
+            if (!trueLine || !falseLine) return [[], []];
 
-        const firstLine = lines.find(l => l.startId === entrypoint.id)
+            const trueShape = shapes.find(s => s.id === trueLine.endId);
+            const falseShape = shapes.find(s => s.id === falseLine.endId);
 
-        if (!firstLine) continue;
-        
-        let nextShape = shapes.find(s => s.id === firstLine.endId)
-        while (nextShape) {
-
-            console.log(nextShape);
-
-            const line = lines.find(l => l.startId === nextShape.id)
-            if (!line) break;
-
-            nextShape = shapes.find(s => s.id === line.endId)
+            return [startShape, [iterate(trueShape), iterate(falseShape)]]
         }
+
+        const line = lines.find(l => l.startId === startShape.id)
+
+        if (line) {
+            const nextShape = shapes.find(s => s.id === line.endId);
+            if (nextShape) {
+                return [startShape, ...iterate(nextShape)]
+            }
+        }
+
+        return [startShape];
     }
 
-    PARSED_HOOKS = hooks;
-    // const conditions = res.data.flatMap(parseConditions);
+    const hooks = entrypoints.map(iterate);
 
-    //  console.log(conditions)
+    HOOKS = hooks;
 
+    BASE_SCRIPTS = scripts.filter(s => !hooks.flat(10).some(hs => hs.id === s.id));
+
+    console.log(BASE_SCRIPTS)
 };
