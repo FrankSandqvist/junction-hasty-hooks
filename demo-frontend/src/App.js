@@ -57,11 +57,11 @@ function App() {
 
   const description = useMemo(() =>
     [
-      'Sometimes, as the lazy developers we are, we just want to hide some information on a backend and some basic functionality from it available on a website. In this example, we let our customers check if their subscription is active.',
-      'What if we just want to make a super-simple pricing function on our website? We don\'t want to share our material prices, but deploying a proper backend seems overkill. Let\'s just do quick \'n dirty using Hasty Hooks!',
+      'Sometimes, as the lazy developers we are, we want to fetch information from a backend to have basic functionality from it available on a website. In this example, we let our customers check if their subscription is active.',
+      'What if we just want to make a super-simple pricing function on our website? We don\'t want to do it on the frontend (our pricing formula is secret!), but deploying a proper backend seems overkill. Let\'s just do quick \'n dirty using Hasty Hooks!',
       'We can also make use of data fetching in our hook. So let\'s get really meta and use it to post a note to this very Miro board.',
-      'What if we have a bug? No problem. Try it out and take a look at what happens on the board!',
-      'We can also use this to quicky make a webhook that can be integrated with other services, such as Stripe and Hubspot! Unfortunately, this one can\'t be tested here.. but it will work. 👍',
+      'What if we have a bug? No problem. Try it out, and take a look at what happens on the board!',
+      'We can also use Hasty Hooks to quicky make a webhook that can be integrated with other services, such as Stripe and Hubspot! Unfortunately, this one can\'t be tested here.. but it will work. 👍',
     ][demo],
     [demo]
   )
@@ -129,7 +129,7 @@ function App() {
     if (res.ok) {
       switch (demo) {
         case 0: {
-          setMessage(body ? 'Your subscription is active, yay!' : 'Your subscription is not active.');
+          setMessage(body ? 'Your subscription is active, yay!' : 'Our system tells us your subscription is not active.');
           break;
         }
         case 1: {
@@ -137,7 +137,7 @@ function App() {
           break;
         }
         case 2: {
-          setMessage(`Cool!`);
+          setMessage(`Take a look at the Miro board!`);
           break;
         }
         case 3: {
@@ -145,7 +145,6 @@ function App() {
           break;
         }
         default: {
-
         }
       }
       return;
@@ -181,8 +180,8 @@ function App() {
         <div className="flex flex-col items-center md:flex-row mb-8">
           <img alt="Logo" src="logo.png" className="max-w-sm mb-8 lg:w-60 2xl:max-w-sm 2xl:w-auto md:mb-0 md:mr-12" />
           <div className="flex flex-grow items-start justify-around md:flex-col md:items-stretch md:justify-evenly">
-            <Button onClick={() => window.href = "https://github.com/FrankSandqvist/junction-hasty-hooks"} marginBottom>Source code</Button>
-            <Button onClick={() => window.href = "https://www.youtube.com/watch?v=CgcuSX5dQr0"} >Watch the video</Button>
+            <a className={`text-center border-white bg-black text-white p-2 border-2 rounded-lg transform transition-all duration-200 border-b-2 translate-y-0.5 mb-4`} href="https://github.com/FrankSandqvist/junction-hasty-hooks">Source code</a>
+            <a className={`text-center border-white bg-black text-white p-2 border-2 rounded-lg transform transition-all duration-200 border-b-2 translate-y-0.5`} href="https://www.youtube.com/watch?v=CgcuSX5dQr0" >Watch the video</a>
           </div>
         </div>
         <p className="mb-2">
