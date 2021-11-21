@@ -23,7 +23,7 @@ Hasty Hooks is a way to define real API endpoints using a Miro board. Changes in
 
 It's a way to create API's in a quick'n'dirty way using nothing but Miro.
 
-*Circles* define the start and end of the endpoints. The start takes the syntax of `[method] [path]`, e.g. `get user-info`. If the method is GET the query strings are added as variables as they are named. (only camelCase works) If it's POST, the endpoint can parse a JSON payload.
+*Circles* define the start and end of the endpoints. The start takes the syntax of `[method] [path]`, e.g. `get user-info`. If the method is GET the query strings are added as variables as they are named. (only camelCase works) If it's POST, the endpoint can parse a JSON payload. The syntax for the response is `[status] [value]`, e.g. `200 "ok"` or `200 userInfo`.
 
 *Rectangles* define scripts. Just plain JS. Whenever defining new variables, the var/let/const keyword has to be omitted due to how Node's VM works. Fetch is available, and top-level await works.
 
