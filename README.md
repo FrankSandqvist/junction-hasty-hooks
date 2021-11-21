@@ -34,7 +34,7 @@ It's a way to create API's in a quick'n'dirty way using nothing but Miro.
 Pretty much everything! This would require a full-rewrite to be a viable product. But a few things in no particular order;
 
 - UI to connect Miro boards
-- Monitoring
+- Make it more resillient for invalid configurations/calls (it's quite error-prone now)
 - Better solution than a CRON job to get board updates
 - Proper sandboxing
 - Cleaner code
