@@ -142,10 +142,6 @@ const parse = async () => {
         }
     }).then(r => r.json());
     
-    console.log(res);
-
-    console.log(process.env);
-
     //@ts-ignore
     const entrypoints = res.data.flatMap(parseEntrypoint);
 
