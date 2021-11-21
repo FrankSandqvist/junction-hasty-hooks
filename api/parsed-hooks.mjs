@@ -141,6 +141,8 @@ const parse = async () => {
             Authorization: `Bearer ${process.env.MIRO_TOKEN}`
         }
     }).then(r => r.json());
+    
+    console.log(res);
 
     //@ts-ignore
     const entrypoints = res.data.flatMap(parseEntrypoint);
