@@ -181,8 +181,8 @@ function App() {
         <div className="flex flex-col items-center md:flex-row mb-8">
           <img alt="Logo" src="logo.png" className="max-w-sm mb-8 lg:w-60 2xl:max-w-sm 2xl:w-auto md:mb-0 md:mr-12" />
           <div className="flex flex-grow items-start justify-around md:flex-col md:items-stretch md:justify-evenly">
-            <Button onClick={() => window.href = ""} marginBottom>Source code</Button>
-            <Button onClick={() => window.href = ""} >Watch the video</Button>
+            <Button onClick={() => window.href = "https://github.com/FrankSandqvist/junction-hasty-hooks"} marginBottom>Source code</Button>
+            <Button onClick={() => window.href = "https://www.youtube.com/watch?v=CgcuSX5dQr0"} >Watch the video</Button>
           </div>
         </div>
         <p className="mb-2">
