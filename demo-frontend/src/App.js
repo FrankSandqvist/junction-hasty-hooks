@@ -217,13 +217,13 @@ function App() {
           />
           <div className="flex flex-grow items-start justify-around md:flex-col md:items-stretch md:justify-evenly">
             <a
-              className={`text-center border-white bg-black text-white p-2 border-2 rounded-lg transform transition-all duration-200 border-b-2 translate-y-0.5 mr-4 mb-4 md:mr-0`}
+              className={`text-center border-white bg-black text-white p-2 border-2 rounded-lg border-b-2 mr-4 mb-4 md:mr-0`}
               href="https://github.com/FrankSandqvist/junction-hasty-hooks"
             >
               Source code & Docs
             </a>
             <a
-              className={`text-center border-white bg-black text-white p-2 border-2 rounded-lg transform transition-all duration-200 border-b-2 translate-y-0.5`}
+              className={`text-center border-white bg-black text-white p-2 border-2 rounded-lg border-b-2`}
               href="https://www.youtube.com/watch?v=CgcuSX5dQr0"
             >
               Watch the video
@@ -239,6 +239,13 @@ function App() {
           Check out a few of these use-case examples, or you can call the API
           directly!
         </p>
+        <a
+          className={`text-center border-black bg-white text-black p-2 border-2 rounded-lg border-b-2 mb-4`}
+          href="https://us18.list-manage.com/contact-form?u=72f10657613a9102054a47fa1&form_id=02d609b30cbdd5a6f7c84835f0c92541"
+        >
+          I would use this! Keep me updated
+        </a>
+
         <div className="grid gap-2 items-start mb-4 md:grid-flow-col">
           <Button onClick={() => setDemo(0)} active={demo === 0}>
             Lookup
